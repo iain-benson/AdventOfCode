@@ -1,5 +1,6 @@
 // Online C++ compiler to run C++ program online
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <list>
 #include <string>
@@ -165,6 +166,8 @@ std::vector<std::string> input = {
 int main() {
     
     std::list<int> parts;
+    std::list<int> gearRatios;
+    std::multimap<std::pair<int,int>, int> stars;
     
     for ( int line = 0 ; line < input.size() ; ++ line ) {
         for ( int col = 0 ; col < input[line].size() ; ++ col ) {
@@ -187,7 +190,13 @@ int main() {
                              (input[checkLine][checkCol] < 48 ||
                                   input[checkLine][checkCol] > 57 ) )
                         {
-                            parts.push_back(atoi(input[line].substr(col, numberEnd - col + 1).c_str()));
+                            int partNum = atoi(input[line].substr(col, numberEnd - col + 1).c_str());
+                            
+                            if ( input[checkLine][checkCol] == '*') {
+                                stars.emplace(std::make_pair(std::make_pair(checkLine, checkCol), partNum));
+                            }
+                            
+                            parts.push_back(partNum);
                             break;
                         }
                     }
@@ -197,7 +206,14 @@ int main() {
         }
     }
     
+    for( auto it = stars.begin(); it != stars.end(); it = stars.upper_bound(it->first)) {
+        if ( stars.count(it->first) == 2 ) {
+           gearRatios.push_back(it->second * std::next(it)->second);
+        }
+    }
+    
     std::cout << "Total : " << std::accumulate(parts.begin(), parts.end(), 0) << std::endl;
+    std::cout << "Gear Total : " << std::accumulate(gearRatios.begin(), gearRatios.end(), 0) << std::endl;
     
     return 0;
 }
