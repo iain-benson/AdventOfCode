@@ -5,6 +5,7 @@
 #include <regex>
 #include <set>
 #include <string>
+#include <vector>
 
 std::list<std::string> input = {
 
@@ -359,7 +360,7 @@ int doMap(const std::list<Mapping>& maps, unsigned int value) {
 
 int main() {
 
-    std::set<unsigned int> seeds;
+    std::vector<unsigned int> seeds;
     std::list<Mapping> seedToSoil;
     std::list<Mapping> soilToFert;
     std::list<Mapping> fertToWater;
@@ -383,7 +384,7 @@ int main() {
             
             for ( auto seed: seedVec ) {
                 if ( seed != "" ) {
-                    seeds.insert(atol(seed.c_str()));
+                    seeds.push_back(atol(seed.c_str()));
                 }
             }
         } else if (split[0] == "seed-to-soil map") {
@@ -416,9 +417,9 @@ int main() {
 
     unsigned int minLoc = UINT_MAX;
 
-    for ( auto seed: seeds ) {
+    for ( int seed = 0 ; seed < seeds.size() ; ++seed ) {
         
-        unsigned int soil = doMap(seedToSoil, seed);
+        unsigned int soil = doMap(seedToSoil, seeds[seed]);
         unsigned int fert = doMap(soilToFert, soil);
         unsigned int water = doMap(fertToWater, fert);
         unsigned int light = doMap(waterToLight, water);
@@ -429,7 +430,27 @@ int main() {
         minLoc = std::min(minLoc, loc);
     }
     
+    unsigned int minLoc2 = UINT_MAX;
+
+    for ( int seed = 0 ; seed < seeds.size() ; seed = seed + 2 ) {
+        for ( int seedNum = seeds[seed] ; seedNum < seeds[seed] + seeds[seed + 1] ; ++seedNum) {
+
+            unsigned int soil = doMap(seedToSoil, seedNum);
+            unsigned int fert = doMap(soilToFert, soil);
+            unsigned int water = doMap(fertToWater, fert);
+            unsigned int light = doMap(waterToLight, water);
+            unsigned int temp = doMap(lightToTemp, light);
+            unsigned int humid = doMap(tempToHumid, temp);
+            unsigned int loc = doMap(humidToLoc, humid);
+            
+            //std::cout << seedNum << "->" << soil << "->" << fert << "->" << water << "->" << light << "->" << temp << "->" << humid << "->" << loc << std::endl;
+            
+            minLoc2 = std::min(minLoc2, loc);
+        }
+    }
+
     std::cout << "Minimum location: " << minLoc << std::endl;
+    std::cout << "Minimum location 2: " << minLoc2 << std::endl;
     
     return 0;
 }
