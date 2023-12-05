@@ -410,47 +410,38 @@ int main() {
             unsigned int srcStart = atol(mapping[1].c_str());
             unsigned int len = atol(mapping[2].c_str());
             
-            currentMap->push_back(Mapping(srcStart, destStart, len));
+            currentMap->push_back(Mapping(destStart, srcStart, len));
 
         }
     }
 
-    unsigned int minLoc = UINT_MAX;
-
-    for ( int seed = 0 ; seed < seeds.size() ; ++seed ) {
-        
-        unsigned int soil = doMap(seedToSoil, seeds[seed]);
-        unsigned int fert = doMap(soilToFert, soil);
-        unsigned int water = doMap(fertToWater, fert);
-        unsigned int light = doMap(waterToLight, water);
-        unsigned int temp = doMap(lightToTemp, light);
-        unsigned int humid = doMap(tempToHumid, temp);
-        unsigned int loc = doMap(humidToLoc, humid);
-        
-        minLoc = std::min(minLoc, loc);
-    }
+    bool loc1Found = false;
+    bool loc2Found = false;
     
-    unsigned int minLoc2 = UINT_MAX;
+    for ( int loc = 0 ; loc < UINT_MAX && ( !loc1Found || !loc2Found ) ; ++loc ) {
+        
+        unsigned int humid = doMap(humidToLoc, loc);
+        unsigned int temp = doMap(tempToHumid, humid);
+        unsigned int light = doMap(lightToTemp, temp);
+        unsigned int water = doMap(waterToLight, light);
+        unsigned int fert = doMap(fertToWater, water);
+        unsigned int soil = doMap(soilToFert, fert);
+        unsigned int seed = doMap(seedToSoil, soil);
+        
+        for ( int seedNum = 0 ; seedNum < seeds.size() && !loc1Found ; ++seedNum ) {
+            if ( seed == seeds[seedNum] ) {
+                std::cout << "Minimum Location Part 1: " << loc << std::endl;
+                loc1Found = true;
+            }
+        }
 
-    for ( int seed = 0 ; seed < seeds.size() ; seed = seed + 2 ) {
-        for ( int seedNum = seeds[seed] ; seedNum < seeds[seed] + seeds[seed + 1] ; ++seedNum) {
-
-            unsigned int soil = doMap(seedToSoil, seedNum);
-            unsigned int fert = doMap(soilToFert, soil);
-            unsigned int water = doMap(fertToWater, fert);
-            unsigned int light = doMap(waterToLight, water);
-            unsigned int temp = doMap(lightToTemp, light);
-            unsigned int humid = doMap(tempToHumid, temp);
-            unsigned int loc = doMap(humidToLoc, humid);
-            
-            //std::cout << seedNum << "->" << soil << "->" << fert << "->" << water << "->" << light << "->" << temp << "->" << humid << "->" << loc << std::endl;
-            
-            minLoc2 = std::min(minLoc2, loc);
+        for ( int seedNum = 0 ; seedNum < seeds.size() && !loc2Found ; seedNum += 2 ) {
+            if ( seed >= seeds[seedNum] && seed < seeds[seedNum] + seeds[seedNum + 1] ) {
+                std::cout << "Minimum Location Part 2: " << loc << std::endl;
+                loc2Found = true;
+            }
         }
     }
 
-    std::cout << "Minimum location: " << minLoc << std::endl;
-    std::cout << "Minimum location 2: " << minLoc2 << std::endl;
-    
     return 0;
 }
