@@ -15,7 +15,7 @@ Welcome to GDB Online.
 std::vector<char> cards = { 'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2' };
 
 std::vector<std::string> input = {
-/*
+
 "757T6 637",
 "TTT2T 589",
 "4567T 670",
@@ -1016,19 +1016,60 @@ std::vector<std::string> input = {
 "Q9QQQ 891",
 "6262A 585",
 "K2K2K 947"
-*/
 
+/*
 "32T3K 765",
 "T55J5 684",
 "KK677 28",
 "KTJJT 220",
 "QQQJA 483"
+*/
 };
 
-auto cmp = [](const std::string&a, const std::string& b) { 
+auto cmp = [](const std::string&lhs, const std::string& rhs) { 
     
-    // TODO Compare Hands
-    return a > b;
+    int lhsMaxCount = 0;
+    int rhsMaxCount = 0;
+    
+    int lhs2ndMaxCount = 0;
+    int rhs2ndMaxCount = 0;
+    
+    for ( auto card : cards ) {
+        int lhsCount = std::count( lhs.begin(), lhs.end(), card );
+        int rhsCount = std::count( rhs.begin(), rhs.end(), card );
+        
+        if ( lhsCount >= lhsMaxCount ) {
+            lhs2ndMaxCount = lhsMaxCount;
+            lhsMaxCount = lhsCount;
+        } else if ( lhsCount >= lhs2ndMaxCount ) {
+            lhs2ndMaxCount = lhsCount;
+        }
+
+        if ( rhsCount >= rhsMaxCount ) {
+            rhs2ndMaxCount = rhsMaxCount;
+            rhsMaxCount = rhsCount;
+        } else if ( rhsCount >= rhs2ndMaxCount ) {
+            rhs2ndMaxCount = rhsCount;
+        }
+    }
+    
+    if ( lhsMaxCount < rhsMaxCount || ( lhsMaxCount == rhsMaxCount && lhs2ndMaxCount < rhs2ndMaxCount ) ) {
+        return true;
+    }
+    
+    if ( lhsMaxCount > rhsMaxCount || lhs2ndMaxCount > rhs2ndMaxCount ) {
+        return false;
+    }
+    
+    for ( int i = 0 ; i < lhs.length() ; ++i ) {
+        
+        if ( lhs[i] != rhs[i] ) {
+            return std::distance(cards.begin(), std::find( cards.begin(), cards.end(), lhs[i] ) ) >
+                   std::distance(cards.begin(), std::find( cards.begin(), cards.end(), rhs[i] ) );
+        }
+    }
+    
+    return false;
     
 };
 
