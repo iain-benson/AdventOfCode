@@ -277,16 +277,16 @@ int main() {
 
                 x = x2;
                 y = y2;
-                x2 = paths[y2][x2].second.first;
-                y2 = paths[y2][x2].second.second;
+                x2 = paths[y][x].second.first;
+                y2 = paths[y][x].second.second;
                 ++distance;
             
             } else if ( paths[y2][x2].second.first == x && paths[y2][x2].second.second == y )  {
 
                 x = x2;
                 y = y2;
-                x2 = paths[y2][x2].first.first;
-                y2 = paths[y2][x2].first.second;
+                x2 = paths[y][x].first.first;
+                y2 = paths[y][x].first.second;
                 ++distance;
                 
             } else {
